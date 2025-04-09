@@ -2,7 +2,7 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -70,14 +70,61 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+	where
+        T: Clone + Ord,
+    {
+        let mut merged = LinkedList::new();
+
+        // Collect elements from list_a
+        let mut vec_a = Vec::new();
+        let mut current_node = list_a.start;
+        while let Some(ptr) = current_node {
+            let node = unsafe { &*ptr.as_ptr() };
+            vec_a.push(node.val.clone());
+            current_node = node.next;
         }
-	}
+
+        // Collect elements from list_b
+        let mut vec_b = Vec::new();
+        let mut current_node = list_b.start;
+        while let Some(ptr) = current_node {
+            let node = unsafe { &*ptr.as_ptr() };
+            vec_b.push(node.val.clone());
+            current_node = node.next;
+        }
+
+        // Merge the two vectors
+        let mut merged_vec = Vec::new();
+        let (mut i, mut j) = (0, 0);
+        while i < vec_a.len() && j < vec_b.len() {
+            if vec_a[i] <= vec_b[j] {
+                merged_vec.push(vec_a[i].clone());
+                i += 1;
+            } else {
+                merged_vec.push(vec_b[j].clone());
+                j += 1;
+            }
+        }
+
+        // Append remaining elements from vec_a
+        while i < vec_a.len() {
+            merged_vec.push(vec_a[i].clone());
+            i += 1;
+        }
+
+        // Append remaining elements from vec_b
+        while j < vec_b.len() {
+            merged_vec.push(vec_b[j].clone());
+            j += 1;
+        }
+
+        // Build the merged linked list
+        for val in merged_vec {
+            merged.add(val);
+        }
+
+        merged
+    }
 }
 
 impl<T> Display for LinkedList<T>
